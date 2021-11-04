@@ -520,6 +520,24 @@ class CoordAtt(nn.Module):
         out = identity * a_w * a_h
 
         return out
+class ChannelAttentionModule(nn.Module):
+    def __init__(self, c1, reduction=16):
+        super(ChannelAttentionModule, self).__init__()
+        mid_channel = c1 // reduction
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.max_pool = nn.AdaptiveMaxPool2d(1)
+
+        self.shared_MLP = nn.Sequential(
+            nn.Linear(in_features=c1, out_features=mid_channel),
+            nn.LeakyReLU(0.1, inplace=True),
+            nn.Linear(in_features=mid_channel, out_features=c1)
+        )
+       # self.sigmoid = nn.Sigmoid()
+        self.act=nn.SiLU()
+    def forward(self, x):
+        avgout = self.shared_MLP(self.avg_pool(x).view(x.size(0),-1)).unsqueeze(2).unsqueeze(3)
+        maxout = self.shared_MLP(self.max_pool(x).view(x.size(0),-1)).unsqueeze(2).unsqueeze(3)
+        return self.act(avgout + maxout) 
 class CBAM(nn.Module):
     def __init__(self, c1,c2):
         super(CBAM, self).__init__()
