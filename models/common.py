@@ -537,7 +537,18 @@ class ChannelAttentionModule(nn.Module):
     def forward(self, x):
         avgout = self.shared_MLP(self.avg_pool(x).view(x.size(0),-1)).unsqueeze(2).unsqueeze(3)
         maxout = self.shared_MLP(self.max_pool(x).view(x.size(0),-1)).unsqueeze(2).unsqueeze(3)
-        return self.act(avgout + maxout) 
+        return self.act(avgout + maxout)
+class SpatialAttentionModule(nn.Module):
+    def __init__(self):
+        super(SpatialAttentionModule, self).__init__()
+        self.conv2d = nn.Conv2d(in_channels=2, out_channels=1, kernel_size=7, stride=1, padding=3)
+        self.act=nn.SiLU()
+    def forward(self, x):
+        avgout = torch.mean(x, dim=1, keepdim=True)
+        maxout, _ = torch.max(x, dim=1, keepdim=True)
+        out = torch.cat([avgout, maxout], dim=1)
+        out = self.act(self.conv2d(out))
+        return out
 class CBAM(nn.Module):
     def __init__(self, c1,c2):
         super(CBAM, self).__init__()
