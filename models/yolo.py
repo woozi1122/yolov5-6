@@ -320,8 +320,8 @@ if __name__ == '__main__':
         img = torch.rand(8 if torch.cuda.is_available() else 1, 3, 640, 640).to(device)
         y = model(img, profile=True)
 
-    # Tensorboard (not working https://github.com/ultralytics/yolov5/issues/2898)
-    # from torch.utils.tensorboard import SummaryWriter
-    # tb_writer = SummaryWriter('.')
-    # LOGGER.info("Run 'tensorboard --logdir=models' to view tensorboard at http://localhost:6006/")
-    # tb_writer.add_graph(torch.jit.trace(model, img, strict=False), [])  # add model graph
+    Tensorboard (not working https://github.com/ultralytics/yolov5/issues/2898)
+    from torch.utils.tensorboard import SummaryWriter
+    tb_writer = SummaryWriter('.')
+    LOGGER.info("Run 'tensorboard --logdir=models' to view tensorboard at http://localhost:6006/")
+    tb_writer.add_graph(torch.jit.trace(model, img, strict=False), [])  # add model graph
